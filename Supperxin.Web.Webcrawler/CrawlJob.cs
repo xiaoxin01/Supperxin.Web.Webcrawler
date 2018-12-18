@@ -21,6 +21,7 @@ namespace Supperxin.Web.Webcrawler
         public string SaveResultsTo { get; set; }
         public bool Enabled { get; set; }
         public List<Meta> Metas { get; set; }
+        public List<Operation> Operations { get; set; }
         public List<FieldMapping> Fields { get; set; }
         public Dictionary<string, Dictionary<string, object>> CheckCacheMetas { get; set; }
         public bool CheckCacheMetasChanged { get; set; }

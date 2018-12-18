@@ -45,6 +45,7 @@ namespace Supperxin.Web.Webcrawler
                 }
 
 
+
                 var itemsHtml = page.Selectable.XPath(this.job.ResultItemXPath).GetValues();
                 var itemDocument = new HtmlDocument();
                 var hasCachedPage = false;
@@ -83,9 +84,17 @@ namespace Supperxin.Web.Webcrawler
                     }
 
                     // if page is not match result item regex, ignore
-                    if (itemMeta.ContainsKey("Url") && !PageIsResultItem(itemMeta["Url"] as string))
+                    if (!PageIsResultItem(html))
                     {
                         continue;
+                    }
+
+                    // make operation to field
+                    foreach (var operation in this.job.Operations)
+                    {
+                        var opObject = Operations.OperationFactory.MakeOperatoin(operation.OperationName);
+                        var opValue = opObject.Operate(itemMeta[operation.FieldName]);
+                        itemMeta[operation.FieldName] = opValue;
                     }
 
                     // Check cache
