@@ -14,7 +14,6 @@ namespace Supperxin.Web.Webcrawler
         public string[] StartUrls { get; set; }
         public string IsListPageCheckRegex { get; set; }
         public string IsItemPageCheckRegex { get; set; }
-        public string ListPageFormat { get; set; }
         public int ListPageStart { get; set; }
         public string ResultItemXPath { get; set; }
         public string ResultItemRegex { get; set; }
@@ -22,6 +21,7 @@ namespace Supperxin.Web.Webcrawler
         public bool Enabled { get; set; }
         public List<Meta> Metas { get; set; }
         public List<Operation> Operations { get; set; }
+        public PageIteration PageIteration { get; set; }
         public List<FieldMapping> Fields { get; set; }
         public Dictionary<string, Dictionary<string, object>> CheckCacheMetas { get; set; }
         public bool CheckCacheMetasChanged { get; set; }
@@ -70,5 +70,22 @@ namespace Supperxin.Web.Webcrawler
         }
         public HashSet<string> StandardFields { get; set; }
         public string UserAgent { get; set; }
+    }
+
+    public class PageIteration
+    {
+        private PageIterations.IPageIteration _pageIteration;
+        public string IterationName { get; set; }
+        public string PageFormat { get; set; }
+        public int StartPage { get; set; }
+        public string GetNextPage()
+        {
+            if (null == this._pageIteration)
+            {
+                this._pageIteration = PageIterations.PageIterationFactory.MakePageIteration(this.IterationName);
+            }
+
+            return this._pageIteration.GetNextPage(this.PageFormat, this.StartPage);
+        }
     }
 }

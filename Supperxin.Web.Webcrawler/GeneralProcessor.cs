@@ -18,7 +18,34 @@ namespace Supperxin.Web.Webcrawler
         }
         protected override void Handle(Page page)
         {
-            if (PageIsListPage(page))
+            if (PageIsResultItem(page.Url))
+            {
+                var itemMeta = new Dictionary<string, object>();
+                //itemMeta.Add("Url", page.Url);
+
+                foreach (var field in job.Fields)
+                {
+                    if (string.IsNullOrEmpty(field.FieldValue))
+                    {
+                        itemMeta.Add(field.FieldName, page.Selectable.XPath(field.XPath).GetValue());
+                    }
+                    else
+                    {
+                        itemMeta.Add(field.FieldName, field.FieldValue);
+                    }
+                }
+
+                if (this.job.CheckCacheMetas.ContainsKey(page.Url))
+                {
+                    foreach (var meta in this.job.CheckCacheMetas[page.Url])
+                    {
+                        itemMeta.Add(meta.Key, meta.Value);
+                    }
+                }
+                page.AddResultItem(page.Url, itemMeta);
+            }
+            else
+            //(PageIsListPage(page))
             {
                 var pageMeta = new Dictionary<string, object>();
                 var pageCacheMeta = new Dictionary<string, object>();
@@ -149,40 +176,27 @@ namespace Supperxin.Web.Webcrawler
                 }
 
                 // means all item in this page is crawled, so need to check next page
+                // !hasCachedPage means this page contains cached item, so the rest pages is crawled already.
                 // items need to > 0 because a page not exist may return 0 records
-                if (!string.IsNullOrEmpty(this.job.ListPageFormat) && !hasCachedPage && itemsHtml.Count() > 0)
+
+                if (null != this.job.PageIteration && !hasCachedPage && itemsHtml.Count() > 0)
                 {
-                    var nextPageUrl = string.Format(this.job.ListPageFormat, this.job.ListPageStart++);
-                    page.AddTargetRequest(nextPageUrl);
+                    var nextPageUrl = this.job.PageIteration.GetNextPage();
+                    if (!string.IsNullOrEmpty(nextPageUrl))
+                    {
+                        page.AddTargetRequest(nextPageUrl);
+                    }
                 }
+
+                // if (!string.IsNullOrEmpty(this.job.ListPageFormat) && !hasCachedPage && itemsHtml.Count() > 0)
+                // {
+                //     var nextPageUrl = string.Format(this.job.ListPageFormat, this.job.ListPageStart++);
+                //     page.AddTargetRequest(nextPageUrl);
+                // }
+
+
                 // var values = page.Selectable.Links().Regex(this.job.TargetUrlRegex).GetValues();
                 // page.AddTargetRequests(values);
-            }
-            else if (PageIsResultItem(page.Url))
-            {
-                var itemMeta = new Dictionary<string, object>();
-                //itemMeta.Add("Url", page.Url);
-
-                foreach (var field in job.Fields)
-                {
-                    if (string.IsNullOrEmpty(field.FieldValue))
-                    {
-                        itemMeta.Add(field.FieldName, page.Selectable.XPath(field.XPath).GetValue());
-                    }
-                    else
-                    {
-                        itemMeta.Add(field.FieldName, field.FieldValue);
-                    }
-                }
-
-                if (this.job.CheckCacheMetas.ContainsKey(page.Url))
-                {
-                    foreach (var meta in this.job.CheckCacheMetas[page.Url])
-                    {
-                        itemMeta.Add(meta.Key, meta.Value);
-                    }
-                }
-                page.AddResultItem(page.Url, itemMeta);
             }
             // // not scan pages from detail page.
             // // only add page from list page.
@@ -198,9 +212,9 @@ namespace Supperxin.Web.Webcrawler
             return Regex.IsMatch(url, this.job.IsItemPageCheckRegex);
         }
 
-        public bool PageIsListPage(Page page)
-        {
-            return Regex.IsMatch(page.Url, this.job.IsListPageCheckRegex);
-        }
+        // public bool PageIsListPage(Page page)
+        // {
+        //     return Regex.IsMatch(page.Url, this.job.IsListPageCheckRegex);
+        // }
     }
 }
