@@ -178,7 +178,7 @@ namespace Supperxin.Web.Webcrawler
                 // !hasCachedPage means this page contains cached item, so the rest pages is crawled already.
                 // items need to > 0 because a page not exist may return 0 records
 
-                if (null != this.job.PageIteration && !hasCachedPage && itemsHtml.Count() > 0)
+                if (null != this.job.PageIteration && !hasCachedPage /*&& itemsHtml.Count() > 0 */)
                 {
                     var nextPageUrl = this.job.PageIteration.GetNextPage();
                     if (!string.IsNullOrEmpty(nextPageUrl))

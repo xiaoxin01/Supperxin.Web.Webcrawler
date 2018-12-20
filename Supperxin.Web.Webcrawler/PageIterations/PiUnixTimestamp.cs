@@ -6,18 +6,22 @@ namespace Supperxin.Web.Webcrawler.PageIterations
     {
         private DateTime _timeIdentity;
         private bool _initialed;
+        private int _pageCount;
 
-        public string GetNextPage(string pageFormat, int startPage)
+        public string GetNextPage(string pageFormat, int maxPage)
         {
-            InitialPage(startPage);
+            InitialPage(maxPage);
+
+            if (this._pageCount >= maxPage)
+                return null;
             // more info about this function: http://tool.chinaz.com/Tools/unixtime.aspx
             var epoch = (_timeIdentity.ToUniversalTime().Ticks - 621355968000000000) / 10000000;
-            _timeIdentity = _timeIdentity.AddDays(1);
+            _timeIdentity = _timeIdentity.AddDays(-_pageCount++);
 
             return string.Format(pageFormat, epoch);
         }
 
-        private void InitialPage(int startPage)
+        private void InitialPage(int maxPage)
         {
             if (this._initialed)
             {
@@ -25,7 +29,7 @@ namespace Supperxin.Web.Webcrawler.PageIterations
             }
 
             this._initialed = true;
-            this._timeIdentity = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day).AddDays(-startPage);
+            this._timeIdentity = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day).AddDays(1);
         }
     }
 }

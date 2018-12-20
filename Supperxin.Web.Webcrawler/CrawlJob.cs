@@ -77,7 +77,7 @@ namespace Supperxin.Web.Webcrawler
         private PageIterations.IPageIteration _pageIteration;
         public string IterationName { get; set; }
         public string PageFormat { get; set; }
-        public int StartPage { get; set; }
+        public int MaxPage { get; set; }
         public string GetNextPage()
         {
             if (null == this._pageIteration)
@@ -85,7 +85,7 @@ namespace Supperxin.Web.Webcrawler
                 this._pageIteration = PageIterations.PageIterationFactory.MakePageIteration(this.IterationName);
             }
 
-            return this._pageIteration.GetNextPage(this.PageFormat, this.StartPage);
+            return this._pageIteration.GetNextPage(this.PageFormat, this.MaxPage);
         }
     }
 }
