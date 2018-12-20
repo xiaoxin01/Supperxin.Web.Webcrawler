@@ -4,5 +4,6 @@ namespace Supperxin.Web.Webcrawler
     {
         public string FieldName { get; set; }
         public string OperationName { get; set; }
+        public string[] Parameters { get; set; }
     }
 }

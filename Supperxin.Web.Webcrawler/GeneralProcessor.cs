@@ -79,6 +79,11 @@ namespace Supperxin.Web.Webcrawler
 
                 foreach (var html in itemsHtml)
                 {
+                    // if page is not match result item regex, ignore
+                    if (!PageIsResultItem(html))
+                    {
+                        continue;
+                    }
                     itemDocument.LoadHtml(html);
                     var item = itemDocument.DocumentNode;
 
@@ -110,17 +115,11 @@ namespace Supperxin.Web.Webcrawler
                         }
                     }
 
-                    // if page is not match result item regex, ignore
-                    if (!PageIsResultItem(html))
-                    {
-                        continue;
-                    }
-
                     // make operation to field
                     foreach (var operation in this.job.Operations)
                     {
                         var opObject = Operations.OperationFactory.MakeOperatoin(operation.OperationName);
-                        var opValue = opObject.Operate(itemMeta[operation.FieldName]);
+                        var opValue = opObject.Operate(itemMeta[operation.FieldName], operation.Parameters);
                         itemMeta[operation.FieldName] = opValue;
                     }
 

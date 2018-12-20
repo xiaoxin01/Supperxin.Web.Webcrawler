@@ -2,6 +2,6 @@ namespace Supperxin.Web.Webcrawler.Operations
 {
     public interface IOperation
     {
-        object Operate(object value);
+        object Operate(object value, params object[] paras);
     }
 }

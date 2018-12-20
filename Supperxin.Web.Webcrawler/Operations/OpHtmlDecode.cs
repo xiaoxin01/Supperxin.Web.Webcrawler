@@ -2,7 +2,7 @@ namespace Supperxin.Web.Webcrawler.Operations
 {
     public class OpHtmlDecode : IOperation
     {
-        public object Operate(object value)
+        public object Operate(object value, params object[] paras)
         {
             if (!(value is string))
             {
