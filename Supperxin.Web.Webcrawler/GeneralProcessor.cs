@@ -20,7 +20,7 @@ namespace Supperxin.Web.Webcrawler
         {
             if (PageIsResultItem(page.Url))
             {
-                var itemMeta = new Dictionary<string, object>();
+                var itemMeta = this.job.ItemMetaCache.ContainsKey(page.Url) ? this.job.ItemMetaCache[page.Url] : new Dictionary<string, object>();
                 //itemMeta.Add("Url", page.Url);
 
                 foreach (var field in job.Fields)
@@ -35,13 +35,17 @@ namespace Supperxin.Web.Webcrawler
                     }
                 }
 
-                if (this.job.CheckCacheMetas.ContainsKey(page.Url))
-                {
-                    foreach (var meta in this.job.CheckCacheMetas[page.Url])
-                    {
-                        itemMeta.Add(meta.Key, meta.Value);
-                    }
-                }
+                // make operation to field
+                // duplicate with page meta, need to improve
+                OperationFields(itemMeta);
+
+                // if (this.job.CheckCacheMetas.ContainsKey(page.Url))
+                // {
+                //     foreach (var meta in this.job.CheckCacheMetas[page.Url])
+                //     {
+                //         itemMeta.Add(meta.Key, meta.Value);
+                //     }
+                // }
                 page.AddResultItem(page.Url, itemMeta);
             }
             else
@@ -115,14 +119,6 @@ namespace Supperxin.Web.Webcrawler
                         }
                     }
 
-                    // make operation to field
-                    foreach (var operation in this.job.Operations)
-                    {
-                        var opObject = Operations.OperationFactory.MakeOperatoin(operation.OperationName);
-                        var opValue = opObject.Operate(itemMeta[operation.FieldName], operation.Parameters);
-                        itemMeta[operation.FieldName] = opValue;
-                    }
-
                     // Check cache
                     if (checkCacheMeta.Count > 0)
                     {
@@ -160,15 +156,25 @@ namespace Supperxin.Web.Webcrawler
                         }
                     }
 
+
+
                     if (itemMeta.ContainsKey("Url"))
                     {
                         if (this.job.AddResultItemDirectly)
                         {
+                            // make operation to field
+                            OperationFields(itemMeta);
                             page.AddResultItem(itemMeta["Url"] as string, itemMeta);
                             Console.WriteLine($"  Add item: {itemMeta["Url"]}");
                         }
                         else
                         {
+                            // add itemMeta to cache, so when crawl the page detail, can use these meta.
+                            if (!this.job.ItemMetaCache.ContainsKey(itemMeta["Url"] as string))
+                                this.job.ItemMetaCache.Add(itemMeta["Url"] as string, itemMeta);
+                            else
+                                this.job.ItemMetaCache[itemMeta["Url"] as string] = itemMeta;
+
                             page.AddTargetRequest(itemMeta["Url"] as string);
                         }
                     }
@@ -183,6 +189,7 @@ namespace Supperxin.Web.Webcrawler
                     var nextPageUrl = this.job.PageIteration.GetNextPage();
                     if (!string.IsNullOrEmpty(nextPageUrl))
                     {
+                        Console.WriteLine($" --> crawl next page : {nextPageUrl}");
                         page.AddTargetRequest(nextPageUrl);
                     }
                 }
@@ -206,14 +213,22 @@ namespace Supperxin.Web.Webcrawler
             // }
         }
 
+        private void OperationFields(Dictionary<string, object> itemMeta)
+        {
+            if (null == this.job.Operations)
+                return;
+
+            foreach (var operation in this.job.Operations)
+            {
+                var opObject = Operations.OperationFactory.MakeOperatoin(operation.OperationName);
+                var opValue = opObject.Operate(itemMeta[operation.FieldName], operation.Parameters);
+                itemMeta[operation.FieldName] = opValue;
+            }
+        }
+
         private bool PageIsResultItem(string url)
         {
             return Regex.IsMatch(url, this.job.IsItemPageCheckRegex);
         }
-
-        // public bool PageIsListPage(Page page)
-        // {
-        //     return Regex.IsMatch(page.Url, this.job.IsListPageCheckRegex);
-        // }
     }
 }

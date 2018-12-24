@@ -9,10 +9,10 @@ namespace Supperxin.Web.Webcrawler
         {
             this.SaveResultsTo = "results/";
             this.CheckCacheMetas = new Dictionary<string, Dictionary<string, object>>();
+            this.ItemMetaCache = new Dictionary<string, Dictionary<string, object>>();
         }
         public string JobName { get; set; }
         public string[] StartUrls { get; set; }
-        public string IsListPageCheckRegex { get; set; }
         public string IsItemPageCheckRegex { get; set; }
         public int ListPageStart { get; set; }
         public string ResultItemXPath { get; set; }
@@ -24,6 +24,7 @@ namespace Supperxin.Web.Webcrawler
         public PageIteration PageIteration { get; set; }
         public List<FieldMapping> Fields { get; set; }
         public Dictionary<string, Dictionary<string, object>> CheckCacheMetas { get; set; }
+        public Dictionary<string, Dictionary<string, object>> ItemMetaCache { get; set; }
         public bool CheckCacheMetasChanged { get; set; }
         public bool AddResultItemDirectly { get; set; }
         private Dictionary<string, string> _saveTo;
@@ -78,6 +79,7 @@ namespace Supperxin.Web.Webcrawler
         public string IterationName { get; set; }
         public string PageFormat { get; set; }
         public int MaxPage { get; set; }
+        public int StartPage { get; set; }
         public string GetNextPage()
         {
             if (null == this._pageIteration)
@@ -85,7 +87,7 @@ namespace Supperxin.Web.Webcrawler
                 this._pageIteration = PageIterations.PageIterationFactory.MakePageIteration(this.IterationName);
             }
 
-            return this._pageIteration.GetNextPage(this.PageFormat, this.MaxPage);
+            return this._pageIteration.GetNextPage(this.PageFormat, this.MaxPage, this.StartPage);
         }
     }
 }
