@@ -11,7 +11,7 @@ namespace Supperxin.Web.Webcrawler.PageIterations
 
         public string GetNextPage(string pageFormat, params object[] param)
         {
-            if (null == param || param.Length != 2 || !(param[0] is int) || !(param[1] is int))
+            if (null == param || param.Length < 2 || !(param[0] is int) || !(param[1] is int))
                 return null;
 
             var maxPage = (int)param[0];

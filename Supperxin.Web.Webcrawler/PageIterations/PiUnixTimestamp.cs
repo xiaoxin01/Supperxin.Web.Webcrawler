@@ -10,7 +10,7 @@ namespace Supperxin.Web.Webcrawler.PageIterations
 
         public string GetNextPage(string pageFormat, params object[] param)
         {
-            if (null == param || param.Length != 1 || !(param[0] is int))
+            if (null == param || param.Length < 1 || !(param[0] is int))
                 return null;
 
             var maxPage = (int)param[0];
@@ -20,8 +20,7 @@ namespace Supperxin.Web.Webcrawler.PageIterations
             if (this._pageCount >= maxPage)
                 return null;
             // more info about this function: http://tool.chinaz.com/Tools/unixtime.aspx
-            var epoch = (_timeIdentity.ToUniversalTime().Ticks - 621355968000000000) / 10000000;
-            _timeIdentity = _timeIdentity.AddDays(-_pageCount++);
+            var epoch = (_timeIdentity.AddDays(-_pageCount++).ToUniversalTime().Ticks - 621355968000000000) / 10000000;
 
             return string.Format(pageFormat, epoch);
         }
