@@ -1,3 +1,6 @@
-docker-compose -f docker-compose.yml \
-  -f docker-compose.override.yml \
+#!/bin/bash
+
+dir=$(dirname $0)
+docker-compose -f $dir/docker-compose.yml \
+  -f $dir/docker-compose.override.yml \
   up -d
