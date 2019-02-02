@@ -13,6 +13,7 @@ namespace Supperxin.Web.Webcrawler
         }
         public string JobName { get; set; }
         public string[] StartUrls { get; set; }
+        public string ValueContainerType { get; set; }
         public string IsItemPageCheckRegex { get; set; }
         public int ListPageStart { get; set; }
         public string ResultItemXPath { get; set; }

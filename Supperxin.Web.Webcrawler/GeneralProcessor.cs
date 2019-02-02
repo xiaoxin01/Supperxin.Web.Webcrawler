@@ -5,6 +5,8 @@ using System.Text.RegularExpressions;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Processor;
 using HtmlAgilityPack;
+using Supperxin.Web.Webcrawler.ValueContainers;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Supperxin.Web.Webcrawler
 {
@@ -27,7 +29,7 @@ namespace Supperxin.Web.Webcrawler
                 {
                     if (string.IsNullOrEmpty(field.FieldValue))
                     {
-                        itemMeta.Add(field.FieldName, page.Selectable.XPath(field.XPath).GetValue());
+                        itemMeta.Add(field.FieldName, page.Selectable.Selector(field.XPath).GetValue());
                     }
                     else
                     {
@@ -56,7 +58,7 @@ namespace Supperxin.Web.Webcrawler
                 object value = null;
                 foreach (var meta in this.job.Metas.Where(m => m.XPathFrom == "Page"))
                 {
-                    var selectedResults = page.Selectable.XPath(meta.XPath);
+                    var selectedResults = page.Selectable.Selector(meta.XPath);
                     switch (meta.FieldType)
                     {
                         case "Array":
@@ -77,8 +79,9 @@ namespace Supperxin.Web.Webcrawler
 
 
 
-                var itemsHtml = page.Selectable.XPath(this.job.ResultItemXPath).GetValues();
-                var itemDocument = new HtmlDocument();
+                var itemsHtml = page.Selectable.Selector(this.job.ResultItemXPath, this.job.ValueContainerType).GetValues();
+
+                var valueGetterFactory = Program.ServiceProvider.GetService<IValueGetterFactory>();
                 var hasCachedPage = false;
 
                 foreach (var html in itemsHtml)
@@ -88,29 +91,14 @@ namespace Supperxin.Web.Webcrawler
                     {
                         continue;
                     }
-                    itemDocument.LoadHtml(html);
-                    var item = itemDocument.DocumentNode;
+                    var valueContainer = valueGetterFactory.CreateValueGetter(this.job.ValueContainerType, html);
 
                     var itemMeta = pageMeta.ToDictionary(v => v.Key, v => v.Value);
                     var checkCacheMeta = pageCacheMeta.ToDictionary(v => v.Key, v => v.Value);
                     value = null;
                     foreach (var meta in this.job.Metas.Where(m => m.XPathFrom != "Page"))
                     {
-                        switch (meta.FieldType)
-                        {
-                            case "Const":
-                                value = meta.FieldValue;
-                                break;
-                            case "Array":
-                                // need to enhance
-                                value = new string[] { item.SelectSingleNode(meta.XPath).Attributes[meta.Attribute].Value ?? string.Empty };
-                                break;
-                            default:
-                                var node = item.SelectSingleNode(meta.XPath);
-                                value = null != meta.Attribute && null != node.Attributes[meta.Attribute] ? node.Attributes[meta.Attribute].Value : node.InnerText;
-                                value = !string.IsNullOrEmpty(meta.Regex) ? Regex.Match(value as string, meta.Regex).Value : value;
-                                break;
-                        }
+                        value = valueContainer.GetValue<object>(meta);
 
                         itemMeta.Add(meta.FieldName, value);
                         if (meta.CheckCache)

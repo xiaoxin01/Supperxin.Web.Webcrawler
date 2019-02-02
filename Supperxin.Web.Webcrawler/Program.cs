@@ -4,12 +4,14 @@ using System.IO;
 using DotnetSpider.Core;
 using DotnetSpider.Core.Pipeline;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
 namespace Supperxin.Web.Webcrawler
 {
     class Program
     {
+        public static ServiceProvider ServiceProvider;
         static void Main(string[] args)
         {
             var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
@@ -18,6 +20,10 @@ namespace Supperxin.Web.Webcrawler
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{environmentName}.json", optional: true, reloadOnChange: true);
+
+            ServiceProvider = new ServiceCollection()
+                .AddTransient<ValueContainers.IValueGetterFactory, ValueContainers.ValueGetterFactory>()
+                .BuildServiceProvider();
 
             IConfigurationRoot configuration = builder.Build();
 
