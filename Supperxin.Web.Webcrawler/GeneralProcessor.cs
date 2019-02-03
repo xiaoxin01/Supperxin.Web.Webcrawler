@@ -7,6 +7,7 @@ using DotnetSpider.Core.Processor;
 using HtmlAgilityPack;
 using Supperxin.Web.Webcrawler.ValueContainers;
 using Microsoft.Extensions.DependencyInjection;
+using Supperxin.Web.Webcrawler.PageIterations;
 
 namespace Supperxin.Web.Webcrawler
 {
@@ -77,12 +78,13 @@ namespace Supperxin.Web.Webcrawler
                     }
                 }
 
+                // services
+                var valueGetterFactory = Program.ServiceProvider.GetService<IValueGetterFactory>();
 
 
                 var itemsHtml = page.Selectable.Selector(this.job.ResultItemXPath, this.job.ValueContainerType).GetValues();
-
-                var valueGetterFactory = Program.ServiceProvider.GetService<IValueGetterFactory>();
                 var hasCachedPage = false;
+                var itemMeta = pageMeta.ToDictionary(v => v.Key, v => v.Value);
 
                 foreach (var html in itemsHtml)
                 {
@@ -93,7 +95,7 @@ namespace Supperxin.Web.Webcrawler
                     }
                     var valueContainer = valueGetterFactory.CreateValueGetter(this.job.ValueContainerType, html);
 
-                    var itemMeta = pageMeta.ToDictionary(v => v.Key, v => v.Value);
+                    itemMeta = pageMeta.ToDictionary(v => v.Key, v => v.Value);
                     var checkCacheMeta = pageCacheMeta.ToDictionary(v => v.Key, v => v.Value);
                     value = null;
                     foreach (var meta in this.job.Metas.Where(m => m.XPathFrom != "Page"))
@@ -174,7 +176,7 @@ namespace Supperxin.Web.Webcrawler
 
                 if (null != this.job.PageIteration && !hasCachedPage /*&& itemsHtml.Count() > 0 */)
                 {
-                    var nextPageUrl = this.job.PageIteration.GetNextPage();
+                    var nextPageUrl = this.job.PageIteration.GetNextPage(itemMeta);
                     if (!string.IsNullOrEmpty(nextPageUrl))
                     {
                         Console.WriteLine($" --> crawl next page : {nextPageUrl}");

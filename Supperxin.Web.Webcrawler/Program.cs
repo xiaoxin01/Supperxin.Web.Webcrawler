@@ -22,7 +22,8 @@ namespace Supperxin.Web.Webcrawler
                 .AddJsonFile($"appsettings.{environmentName}.json", optional: true, reloadOnChange: true);
 
             ServiceProvider = new ServiceCollection()
-                .AddTransient<ValueContainers.IValueGetterFactory, ValueContainers.ValueGetterFactory>()
+                .AddSingleton<ValueContainers.IValueGetterFactory, ValueContainers.ValueGetterFactory>()
+                .AddSingleton<PageIterations.IPageIterationFactory, PageIterations.PageIterationFactory>()
                 .BuildServiceProvider();
 
             IConfigurationRoot configuration = builder.Build();

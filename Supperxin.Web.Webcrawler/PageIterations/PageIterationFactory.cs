@@ -1,8 +1,8 @@
 namespace Supperxin.Web.Webcrawler.PageIterations
 {
-    public class PageIterationFactory
+    public class PageIterationFactory : IPageIterationFactory
     {
-        public static IPageIteration MakePageIteration(string iterationName)
+        public IPageIteration MakePageIteration(string iterationName)
         {
             var assembly = typeof(PageIterationFactory).Assembly;
             var type = assembly.GetType($"{typeof(PageIterationFactory).Namespace}.{iterationName}");

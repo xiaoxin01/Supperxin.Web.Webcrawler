@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Supperxin.Web.Webcrawler
 {
@@ -81,14 +82,15 @@ namespace Supperxin.Web.Webcrawler
         public string PageFormat { get; set; }
         public int MaxPage { get; set; }
         public int StartPage { get; set; }
-        public string GetNextPage()
+        public string GetNextPage(Dictionary<string, object> metadata)
         {
             if (null == this._pageIteration)
             {
-                this._pageIteration = PageIterations.PageIterationFactory.MakePageIteration(this.IterationName);
+                var pageIterationFactory = Program.ServiceProvider.GetService<PageIterations.IPageIterationFactory>();
+                this._pageIteration = pageIterationFactory.MakePageIteration(this.IterationName);
             }
 
-            return this._pageIteration.GetNextPage(this.PageFormat, this.MaxPage, this.StartPage);
+            return this._pageIteration.GetNextPage(this.PageFormat, this.MaxPage, this.StartPage, metadata);
         }
     }
 }
