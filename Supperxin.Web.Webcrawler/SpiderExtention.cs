@@ -7,9 +7,9 @@ namespace Supperxin.Web.Webcrawler
         public static ISelectable Selector(this ISelectable selectable, string selector, string type = "XPath")
         {
             ISelectable selectableReturn;
-            switch (type.ToLower())
+            switch (type)
             {
-                case "json":
+                case "Json":
                     selectableReturn = selectable.JsonPath(selector);
                     break;
                 default:

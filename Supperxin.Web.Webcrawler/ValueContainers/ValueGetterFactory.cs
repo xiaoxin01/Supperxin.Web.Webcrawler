@@ -5,9 +5,9 @@ namespace Supperxin.Web.Webcrawler.ValueContainers
         public IValueGetter CreateValueGetter(string type, string content)
         {
             IValueGetter valueGetter;
-            switch (type.ToLower())
+            switch (type)
             {
-                case "json":
+                case "Json":
                     valueGetter = new JsonValueGetter(content);
                     break;
                 default: // html
