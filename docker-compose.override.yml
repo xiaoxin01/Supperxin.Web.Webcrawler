@@ -1,1 +1,5 @@
 version: '3.4'
+
+services:
+  supperxin.web.webcrawler:
+    image: supperxin.web.webcrawler:tag
