@@ -1,3 +1,24 @@
+A tool to crawl web site.
+
+## support types:
+
+- [x] Html rendered web site. Get metadata from html directly
+- [x] Json data from api.
+
+## Configuration files
+
+You can get configuration files from:
+
+    Supperxin.Web.Webcrawler/Configurations/
+
+There are some demo configurations for:
+
+1. v2ex hot topic and job.
+2. readhub
+3. 创业邦快讯(cyzone)
+
+## 4 steps to crawl data.
+
 1. copy or create setting file
 
 Choose a setting file from Supperxin.Web.Webcrawler/Configurations, or create your own.
@@ -18,3 +39,15 @@ services:
     image: supperxin.web.webcrawler:[tag]
 ```
 
+3. add save result to (option)
+
+```
+"SaveTo": {
+    "Type": "HttpPipline",
+    "ProcessUrl": [Your url]
+},
+```
+
+4. start crawler
+
+    bash start.sh

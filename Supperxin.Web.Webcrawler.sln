@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Supperxin.Web.Webcrawler", "Supperxin.Web.Webcrawler\Supperxin.Web.Webcrawler.csproj", "{86BAF190-F5C9-481E-A5BC-C23033E6A8A2}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Supperxin.Web.Webcrawler.Tests", "test\Supperxin.Web.Webcrawler.Tests\Supperxin.Web.Webcrawler.Tests.csproj", "{1C3C2F40-CB1B-45D5-8477-5849DEB1ACBE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,10 +17,10 @@ Global
 		{86BAF190-F5C9-481E-A5BC-C23033E6A8A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{86BAF190-F5C9-481E-A5BC-C23033E6A8A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{86BAF190-F5C9-481E-A5BC-C23033E6A8A2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{06C87D3C-A175-443B-A8C4-5987FB508F93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{06C87D3C-A175-443B-A8C4-5987FB508F93}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{06C87D3C-A175-443B-A8C4-5987FB508F93}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{06C87D3C-A175-443B-A8C4-5987FB508F93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C3C2F40-CB1B-45D5-8477-5849DEB1ACBE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C3C2F40-CB1B-45D5-8477-5849DEB1ACBE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C3C2F40-CB1B-45D5-8477-5849DEB1ACBE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C3C2F40-CB1B-45D5-8477-5849DEB1ACBE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

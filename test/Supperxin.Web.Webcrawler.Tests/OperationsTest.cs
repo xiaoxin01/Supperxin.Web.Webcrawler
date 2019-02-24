@@ -18,5 +18,21 @@ namespace Supperxin.Web.Webcrawler.Tests
             //Then
             Assert.Equal("https://www.v2ex.com/t/537750", result);
         }
+
+        [Fact]
+        public void TestOperationFactoryCache()
+        {
+            //Given
+            IOperationFactory factory = new OperationFactory();
+
+            //When
+            var operation1 = factory.MakeOperation(typeof(OpRegexReplace).Name);
+            var operation2 = factory.MakeOperation(typeof(OpRegexReplace).Name);
+            var operation3 = new OpRegexReplace();
+
+            //Then
+            Assert.Same(operation1, operation2);
+            Assert.NotSame(operation1, operation3);
+        }
     }
 }
