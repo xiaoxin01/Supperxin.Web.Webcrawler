@@ -24,6 +24,7 @@ namespace Supperxin.Web.Webcrawler
             ServiceProvider = new ServiceCollection()
                 .AddSingleton<ValueContainers.IValueGetterFactory, ValueContainers.ValueGetterFactory>()
                 .AddSingleton<PageIterations.IPageIterationFactory, PageIterations.PageIterationFactory>()
+                .AddSingleton<Operations.IOperationFactory, Operations.OperationFactory>()
                 .BuildServiceProvider();
 
             IConfigurationRoot configuration = builder.Build();

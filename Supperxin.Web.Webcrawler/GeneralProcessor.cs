@@ -8,16 +8,19 @@ using HtmlAgilityPack;
 using Supperxin.Web.Webcrawler.ValueContainers;
 using Microsoft.Extensions.DependencyInjection;
 using Supperxin.Web.Webcrawler.PageIterations;
+using Supperxin.Web.Webcrawler.Operations;
 
 namespace Supperxin.Web.Webcrawler
 {
     public class GeneralProcessor : BasePageProcessor
     {
         private readonly CrawlJob job;
+        private readonly IOperationFactory _operationFactory;
 
         public GeneralProcessor(CrawlJob job)
         {
             this.job = job;
+            this._operationFactory = Program.ServiceProvider.GetService<Operations.IOperationFactory>();
         }
         protected override void Handle(Page page)
         {
@@ -26,21 +29,20 @@ namespace Supperxin.Web.Webcrawler
                 var itemMeta = this.job.ItemMetaCache.ContainsKey(page.Url) ? this.job.ItemMetaCache[page.Url] : new Dictionary<string, object>();
                 //itemMeta.Add("Url", page.Url);
 
+                object value = null;
                 foreach (var field in job.Fields)
                 {
                     if (string.IsNullOrEmpty(field.FieldValue))
                     {
-                        itemMeta.Add(field.FieldName, page.Selectable.Selector(field.XPath).GetValue());
+                        value = page.Selectable.Selector(field.XPath).GetValue();
                     }
                     else
                     {
-                        itemMeta.Add(field.FieldName, field.FieldValue);
+                        value = field.FieldValue;
                     }
+                    OperationFields(field.FieldName, ref value);
+                    itemMeta.Add(field.FieldName, value);
                 }
-
-                // make operation to field
-                // duplicate with page meta, need to improve
-                OperationFields(itemMeta);
 
                 // if (this.job.CheckCacheMetas.ContainsKey(page.Url))
                 // {
@@ -71,6 +73,7 @@ namespace Supperxin.Web.Webcrawler
                             break;
                     }
 
+                    OperationFields(meta.FieldName, ref value);
                     pageMeta.Add(meta.FieldName, value);
                     if (meta.CheckCache)
                     {
@@ -101,6 +104,7 @@ namespace Supperxin.Web.Webcrawler
                     foreach (var meta in this.job.Metas.Where(m => m.XPathFrom != "Page"))
                     {
                         value = valueContainer.GetValue<object>(meta);
+                        OperationFields(meta.FieldName, ref value);
 
                         itemMeta.Add(meta.FieldName, value);
                         if (meta.CheckCache)
@@ -152,8 +156,6 @@ namespace Supperxin.Web.Webcrawler
                     {
                         if (this.job.AddResultItemDirectly)
                         {
-                            // make operation to field
-                            OperationFields(itemMeta);
                             page.AddResultItem(itemMeta["Url"] as string, itemMeta);
                             Console.WriteLine($"  Add item: {itemMeta["Url"]}");
                         }
@@ -203,17 +205,15 @@ namespace Supperxin.Web.Webcrawler
             // }
         }
 
-        private void OperationFields(Dictionary<string, object> itemMeta)
+        private void OperationFields(string fieldName, ref object value)
         {
-            if (null == this.job.Operations)
+            if (null == this.job.Operations || !this.job.Operations.Exists(o => o.FieldName == fieldName))
                 return;
 
-            foreach (var operation in this.job.Operations)
-            {
-                var opObject = Operations.OperationFactory.MakeOperatoin(operation.OperationName);
-                var opValue = opObject.Operate(itemMeta[operation.FieldName], operation.Parameters);
-                itemMeta[operation.FieldName] = opValue;
-            }
+            var operation = this.job.Operations.First(o => o.FieldName == fieldName);
+
+            var opObject = _operationFactory.MakeOperation(operation.OperationName);
+            value = opObject.Operate(value, operation.Parameters);
         }
 
         private bool PageIsResultItem(string url)
