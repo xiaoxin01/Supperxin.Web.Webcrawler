@@ -34,7 +34,7 @@ namespace Supperxin.Web.Webcrawler
                 {
                     if (string.IsNullOrEmpty(field.FieldValue))
                     {
-                        value = page.Selectable.Selector(field.XPath).GetValue();
+                        value = page.Selectable.Selector(field.XPath).First();
                     }
                     else
                     {
@@ -66,10 +66,10 @@ namespace Supperxin.Web.Webcrawler
                     {
                         case "Array":
                             value = !string.IsNullOrEmpty(meta.Regex) ?
-                                (from r in selectedResults.GetValues() select (Regex.Match(r, meta.Regex).Value)).ToArray() : selectedResults.GetValues();
+                                (from r in selectedResults select (Regex.Match(r, meta.Regex).Value)).ToArray() : selectedResults;
                             break;
                         default:
-                            value = selectedResults.GetValue(); value = !string.IsNullOrEmpty(meta.Regex) ? Regex.Match(value as string, meta.Regex).Value : value;
+                            value = selectedResults.First(); value = !string.IsNullOrEmpty(meta.Regex) ? Regex.Match(value as string, meta.Regex).Value : value;
                             break;
                     }
 
@@ -84,8 +84,10 @@ namespace Supperxin.Web.Webcrawler
                 // services
                 var valueGetterFactory = Program.ServiceProvider.GetService<IValueGetterFactory>();
 
-
-                var itemsHtml = page.Selectable.Selector(this.job.ResultItemXPath, this.job.ValueContainerType).GetValues();
+                // fix link element issue.
+                // see https://stackoverflow.com/questions/31830587/cannot-extract-link-element-using-htmlagilitypack-and-xpath
+                HtmlNode.ElementsFlags.Remove("link");
+                var itemsHtml = page.Selectable.Selector(this.job.ResultItemXPath, this.job.ValueContainerType, content: page.Content);
                 var hasCachedPage = false;
                 var itemMeta = pageMeta.ToDictionary(v => v.Key, v => v.Value);
 
@@ -210,10 +212,11 @@ namespace Supperxin.Web.Webcrawler
             if (null == this.job.Operations || !this.job.Operations.Exists(o => o.FieldName == fieldName))
                 return;
 
-            var operation = this.job.Operations.First(o => o.FieldName == fieldName);
-
-            var opObject = _operationFactory.MakeOperation(operation.OperationName);
-            value = opObject.Operate(value, operation.Parameters);
+            foreach (var operation in this.job.Operations.Where(o => o.FieldName == fieldName))
+            {
+                var opObject = _operationFactory.MakeOperation(operation.OperationName);
+                value = opObject.Operate(value, operation.Parameters);
+            }
         }
 
         private bool PageIsResultItem(string url)
