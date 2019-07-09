@@ -15,7 +15,7 @@ namespace Supperxin.Web.Webcrawler
                 case "Json":
                     selectableReturn = selectable.JsonPath(selector);
                     break;
-                case "Xmllll":
+                case "Xml":
                     HtmlNode.ElementsFlags.Remove("link");
                     var htmlDoc = new HtmlDocument();
                     htmlDoc.LoadHtml(content);
