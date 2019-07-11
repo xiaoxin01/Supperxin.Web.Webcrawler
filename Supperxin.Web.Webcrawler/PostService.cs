@@ -20,6 +20,12 @@ namespace Supperxin.Web.Webcrawler
             var json = doserialize ? JsonConvert.SerializeObject(data) : data.ToString();
             var content = new StringContent(json, Encoding.UTF8, "application/json");
             var result = httpClient.PostAsync(url, content).GetAwaiter().GetResult();
+            var resultString = result.Content.ReadAsStringAsync();
+
+            if (!result.IsSuccessStatusCode)
+            {
+                System.Console.WriteLine(resultString);
+            }
 
             return result.IsSuccessStatusCode;
         }
