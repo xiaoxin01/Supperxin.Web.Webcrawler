@@ -28,7 +28,7 @@ namespace Supperxin.Web.Webcrawler.Operations
             try
             {
                 var dtDateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc);
-                dtDateTime = dtDateTime.AddMilliseconds(Convert.ToDouble(value)).ToLocalTime();
+                dtDateTime = dtDateTime.AddSeconds(Convert.ToDouble(value)).ToLocalTime();
                 result = dtDateTime.ToString();
                 return result;
             }
